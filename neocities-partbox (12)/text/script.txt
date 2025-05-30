@@ -1,0 +1,43 @@
+<script>
+// Create canvas for drawing
+const drawCanvas = document.createElement("canvas");
+drawCanvas.width = 512;
+drawCanvas.height = 512;
+const drawContext = drawCanvas.getContext("2d");
+drawContext.fillStyle = "white";
+drawContext.fillRect(0, 0, drawCanvas.width, drawCanvas.height);
+
+// Create a texture from the canvas
+const drawTexture = new THREE.CanvasTexture(drawCanvas);
+const drawMaterial = new THREE.MeshBasicMaterial({ map: drawTexture });
+
+// Create a whiteboard plane
+const whiteboard = new THREE.Mesh(new THREE.PlaneGeometry(4, 3), drawMaterial);
+whiteboard.position.set(0, 2, -5);
+scene.add(whiteboard);
+
+// Drawing logic
+let isDrawing = false;
+
+renderer.domElement.addEventListener("mousedown", (event) => {
+    if (event.button === 0) isDrawing = true;
+});
+
+renderer.domElement.addEventListener("mouseup", () => {
+    isDrawing = false;
+});
+
+renderer.domElement.addEventListener("mousemove", (event) => {
+    if (!isDrawing) return;
+
+    const x = (event.clientX / window.innerWidth) * drawCanvas.width;
+    const y = (event.clientY / window.innerHeight) * drawCanvas.height;
+
+    drawContext.fillStyle = "black";
+    drawContext.beginPath();
+    drawContext.arc(x, y, 5, 0, Math.PI * 2);
+    drawContext.fill();
+
+    drawTexture.needsUpdate = true;
+});
+</script>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>avatar</title>
+     <style>
+.square {
+  height: 130px;
+  width: 343
+  0px;
+  background-color: #0675af;
+}
+</style>
+
+<style>
+  .container {
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    height: -800vh;
+  }
+</style>
+
+ <div class="square"><div class="container">
+  <img src="partbox2.png" width="348.375" height="91.5"><a href="avatar" class="avatar">avatar</a><a href="groups" class="groups">groups</a>
+
+<style>
+.avatar {
+	background-color:#0675af;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:28px;
+	font-weight:bold;
+	padding:32px 76px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #92b879;
+}
+.avatar:hover {
+	background-color:#0a5a84;
+}
+.avatar:active {
+	position:relative;
+	top:1px;
+}
+</style>
+<style>
+.groups {
+	background-color:#0675af;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:28px;
+	font-weight:bold;
+	padding:32px 76px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #92b879;
+}
+.groups:hover {
+	background-color:#0a5a84;
+}
+.groups:active {
+	position:relative;
+	top:1px;
+}
+</style>
+</div></div>
+  
+  </head>
+  <body>
+<div class="avatarbox">
+    <p>Your avatar will appear here.</p>
+</div>
+
+<style>
+    .avatarbox {
+        height: 400px;
+        width: 300px;
+        background-color: #d1cc8f;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-weight: bold;
+    }
+</style>
+
+<div id="inventory-section">
+    <h2>Your Inventory</h2>
+    <div id="inventory-list"></div>
+</div>
+
+<script>
+    function getLoggedInUser() {
+        return localStorage.getItem("loggedInUser") || "Guest";
+    }
+
+    function getInventory(username) {
+        const userData = JSON.parse(localStorage.getItem("userData")) || {};
+        return userData[username]?.items || [];
+    }
+
+    function showInventory() {
+        const username = getLoggedInUser();
+        let items = getInventory(username);
+        let inventoryList = document.getElementById("inventory-list");
+
+        if (items.length === 0) {
+            inventoryList.innerHTML = "<p>No items in inventory.</p>";
+        } else {
+            inventoryList.innerHTML = items.map(item => 
+                `<p>${item} <button onclick="equipItem('${item}')">Equip</button> <button onclick="unequipItem('${item}')">Unequip</button></p>`
+            ).join("");
+        }
+    }
+
+    function equipItem(itemName) {
+        localStorage.setItem("equippedItem", itemName);
+        alert(`You equipped ${itemName}!`);
+    }
+
+    function unequipItem(itemName) {
+        if (localStorage.getItem("equippedItem") === itemName) {
+            localStorage.removeItem("equippedItem");
+            alert(`You unequipped ${itemName}.`);
+        } else {
+            alert(`You don't have ${itemName} equipped.`);
+        }
+    }
+
+    window.onload = showInventory;
+</script>
+
+<style>
+    #inventory-section {
+        margin-top: 20px;
+        padding: 10px;
+        background: #444;
+        color: white;
+        border-radius: 8px;
+    }
+
+    button {
+        background: blue;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+
+    button:hover {
+        background: darkblue;
+    }
+</style>
+  </body>
+</html>
