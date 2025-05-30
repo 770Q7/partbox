@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Page</title>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+<meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://identitytoolkit.googleapis.com https://firestore.googleapis.com;">
+
+
+
+</head>
+<body>
+ <script>
+// Replace with your Firebase config
+const firebaseConfig = {
+    apiKey: "AIzaSyCiU2CqXcpWa7gLeJz0_-5dqzmgCig3Be8",
+    authDomain: "accounts-e6751.firebaseapp.com",
+    projectId: "accounts-e6751",
+    storageBucket: "accounts-e6751.firebasestorage.app",
+    messagingSenderId: "813001288493",
+    appId: "1:813001288493:web:6a296b6f1b2ca35f1b41a4"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+console.log("Firebase initialized:", firebase);
+
+// Signup function
+function signup() {
+    let email = document.getElementById("signupEmail").value;
+    let password = document.getElementById("signupPass").value;
+
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then(userCredential => {
+            alert("Signup successful!");
+            console.log(userCredential.user); // Check console for user details
+        })
+        .catch(error => alert(error.message));
+}
+
+// Login function
+function login() {
+    let email = document.getElementById("loginEmail").value;
+    let password = document.getElementById("loginPass").value;
+
+    firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(userCredential => {
+            alert("Login successful!");
+            console.log(userCredential.user);
+        })
+        .catch(error => alert(error.message));
+}
+
+</script>
+<input type="email" id="signupEmail" placeholder="Enter email">
+<input type="password" id="signupPass" placeholder="Enter password">
+<button onclick="signup()">Sign Up</button>
+
+<input type="email" id="loginEmail" placeholder="Enter email">
+<input type="password" id="loginPass" placeholder="Enter password">
+<button onclick="login()">Login</button>
+</body>
+</html>

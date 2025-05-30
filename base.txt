@@ -1,0 +1,125 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Capture The Flag Game</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+<body style="margin: 0;">
+    <script>
+        // Create Scene, Renderer, and Camera
+        const scene = new THREE.Scene();
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Create Large Skybox Sphere
+        const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
+        const skyTexture = new THREE.TextureLoader().load("theuttereast.png");
+        const skyMaterial = new THREE.MeshBasicMaterial({ map: skyTexture, side: THREE.BackSide });
+        const skybox = new THREE.Mesh(skyGeometry, skyMaterial);
+        scene.add(skybox);
+
+        function updateSkyPosition() {
+            skybox.position.set(0, 0, 0);
+        }
+
+        // Create Cloud Layer
+        const cloudTexture = new THREE.TextureLoader().load("clouds.png");
+        const cloudMaterial = new THREE.SpriteMaterial({ map: cloudTexture, opacity: 0.8 });
+        const cloudSprite = new THREE.Sprite(cloudMaterial);
+        cloudSprite.scale.set(100, 50, 1);
+        cloudSprite.position.set(0, 25, -30);
+        scene.add(cloudSprite);
+
+        // Create Ground Plane
+        const groundGeometry = new THREE.PlaneGeometry(50, 50);
+        const groundMaterial = new THREE.MeshPhongMaterial({ color: 0x35762c });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        scene.add(ground);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffcc99, 1.2);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xff8800, 2);
+        directionalLight.position.set(0, 50, -30);
+        scene.add(directionalLight);
+
+        // Create Camera
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 2, 5);
+        scene.add(camera);
+
+        // Load Character Model
+        const loader = new THREE.GLTFLoader();
+        let character;
+        loader.load("character.glb", function(gltf) {
+            character = gltf.scene;
+            character.position.set(0, 0.5, 0);
+            character.rotation.x = Math.PI / 2;
+            scene.add(character);
+        });
+
+
+
+        // Movement Variables
+        const movementSpeed = 0.1;
+        const keys = {};
+        window.addEventListener("keydown", (event) => keys[event.key] = true);
+        window.addEventListener("keyup", (event) => keys[event.key] = false);
+
+        // Camera Rotation
+        let isDragging = false;
+        let previousMouseX = 0, previousMouseY = 0;
+        let cameraAngleY = 0, cameraAngleX = 0;
+
+        window.addEventListener("mousedown", (event) => {
+            if (event.button === 2) {
+                isDragging = true;
+                previousMouseX = event.clientX;
+                previousMouseY = event.clientY;
+            }
+        });
+
+        window.addEventListener("mouseup", () => isDragging = false);
+
+        window.addEventListener("mousemove", (event) => {
+            if (isDragging) {
+                const deltaX = event.clientX - previousMouseX;
+                const deltaY = event.clientY - previousMouseY;
+                cameraAngleY -= deltaX * 0.005;
+                cameraAngleX += deltaY * 0.005;
+                cameraAngleX = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, cameraAngleX));
+                previousMouseX = event.clientX;
+                previousMouseY = event.clientY;
+            }
+        });
+
+        window.addEventListener("contextmenu", (event) => event.preventDefault());
+
+        // Animate Function
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (character) {
+                if (keys["w"]) character.position.z -= movementSpeed;
+                if (keys["s"]) character.position.z += movementSpeed;
+                if (keys["a"]) character.position.x -= movementSpeed;
+                if (keys["d"]) character.position.x += movementSpeed;
+
+                const offsetX = Math.sin(cameraAngleY) * 5;
+                const offsetZ = Math.cos(cameraAngleY) * 5;
+                const offsetY = Math.sin(cameraAngleX) * 3;
+                camera.position.set(character.position.x + offsetX, character.position.y + 2 + offsetY, character.position.z + offsetZ);
+                camera.lookAt(character.position);
+            }
+
+            updateSkyPosition();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script><canvas width="3432" height="1314" style="display: block; width: 3432px; height: 1314px;"></canvas><canvas width="3432" height="1314" style="display: block; width: 3432px; height: 1314px;"></canvas>
+
+</body></html>
