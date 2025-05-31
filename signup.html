@@ -37,15 +37,16 @@ function signup() {
         .then(userCredential => {
             let user = userCredential.user;
 
-            return user.updateProfile({ displayName: username })
+            // Send verification email **before** updating profile
+            return user.sendEmailVerification()
+                .then(() => {
+                    return user.updateProfile({ displayName: username });
+                })
                 .then(() => {
                     return firebase.firestore().collection("users").doc(user.uid).set({
                         username: username,
                         userId: user.uid
                     });
-                })
-                .then(() => {
-                    return user.sendEmailVerification();
                 });
         })
         .then(() => {
@@ -56,6 +57,7 @@ function signup() {
             alert(error.message);
         });
 }
+
 
 
 
