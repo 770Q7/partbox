@@ -37,17 +37,13 @@ function signup() {
         .then(userCredential => {
             let user = userCredential.user;
 
-            // Send verification email **before** updating profile
-            return user.sendEmailVerification()
-                .then(() => {
-                    return user.updateProfile({ displayName: username });
-                })
-                .then(() => {
-                    return firebase.firestore().collection("users").doc(user.uid).set({
-                        username: username,
-                        userId: user.uid
-                    });
-                });
+            // Update profile with username
+            return user.updateProfile({
+                displayName: username
+            }).then(() => {
+                // Send verification email **after** updating profile
+                return user.sendEmailVerification();
+            });
         })
         .then(() => {
             alert("Signup successful! Verification email sent.");
@@ -57,6 +53,7 @@ function signup() {
             alert(error.message);
         });
 }
+
 
 
 
@@ -73,10 +70,10 @@ function login() {
             let user = userCredential.user;
 
             if (user.emailVerified) {
-                window.location.href = `https://770q7.github.io/partbox/users/?id=${user.uid}`;
+                alert(`Login successful! Welcome, ${user.displayName}`);
             } else {
                 alert("Please verify your email before logging in.");
-                firebase.auth().signOut();
+                firebase.auth().signOut(); // Prevent unverified login
             }
         })
         .catch(error => {
@@ -88,11 +85,14 @@ function login() {
 
 
 
+
+
 </script>
 <input type="text" id="signupUsername" placeholder="Enter username">
 <input type="email" id="signupEmail" placeholder="Enter email">
 <input type="password" id="signupPass" placeholder="Enter password">
 <button onclick="signup()">Sign Up</button>
+
 
 
 <input type="email" id="loginEmail" placeholder="Enter email">
