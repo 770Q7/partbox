@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar Shop</title>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js"></script>
+</head>
+<body>
+
+    <h1>Avatar Shop</h1>
+    <p>Buy items and they’ll be added to your inventory!</p>
+
+    <div id="shop">
+        <button onclick="buyItem('Hat')">Buy Hat</button>
+        <button onclick="buyItem('Glasses')">Buy Glasses</button>
+        <button onclick="buyItem('Jacket')">Buy Jacket</button>
+    </div>
+
+    <h2>Your Inventory</h2>
+    <ul id="inventoryList"></ul>
+
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        // Function to Buy Items
+        function buyItem(itemId) {
+            let user = firebase.auth().currentUser;
+            if (!user) {
+                alert("You need to be logged in to buy items!");
+                return;
+            }
+
+            firebase.firestore().collection("users").doc(user.uid).update({
+                inventory: firebase.firestore.FieldValue.arrayUnion(itemId)
+            }).then(() => {
+                alert(`You bought a ${itemId}!`);
+                loadInventory(); // Refresh inventory after purchase
+            }).catch(error => {
+                console.error("Error adding item:", error);
+            });
+        }
+
+        // Function to Load User Inventory
+        function loadInventory() {
+            let user = firebase.auth().currentUser;
+            if (!user) return;
+
+            firebase.firestore().collection("users").doc(user.uid).get()
+                .then(doc => {
+                    let items = doc.data().inventory || [];
+                    let list = document.getElementById("inventoryList");
+                    list.innerHTML = "";
+                    items.forEach(item => {
+                        let li = document.createElement("li");
+                        li.innerText = item;
+                        list.appendChild(li);
+                    });
+                })
+                .catch(error => console.error("Error fetching inventory:", error));
+        }
+
+        // Load Inventory When Logged In
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                loadInventory();
+            } else {
+                document.getElementById("inventoryList").innerHTML = "<p>Please log in to view your inventory.</p>";
+            }
+        });
+    </script>
+
+</body>
+</html>
