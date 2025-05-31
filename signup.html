@@ -29,6 +29,7 @@ console.log("Firebase initialized:", firebase);
 
 // Signup function
 function signup() {
+    let username = document.getElementById("signupUsername").value;
     let email = document.getElementById("signupEmail").value;
     let password = document.getElementById("signupPass").value;
 
@@ -36,22 +37,20 @@ function signup() {
         .then(userCredential => {
             let user = userCredential.user;
 
-            // Send verification email
-            user.sendEmailVerification()
-                .then(() => {
-                    alert("Verification email sent! Check your inbox.");
-                })
-                .catch(error => {
-                    console.error("Error sending email:", error);
-                    alert(error.message);
-                });
-
+            // Update profile with username
+            return user.updateProfile({
+                displayName: username
+            });
+        })
+        .then(() => {
+            alert("Signup successful! Username saved.");
         })
         .catch(error => {
             console.error("Signup failed:", error);
             alert(error.message);
         });
 }
+
 
 
 // Login function
@@ -64,7 +63,7 @@ function login() {
             let user = userCredential.user;
 
             if (user.emailVerified) {
-                alert("Login successful!");
+                alert(`Login successful! Welcome, ${user.displayName}`);
             } else {
                 alert("Please verify your email before logging in.");
                 firebase.auth().signOut(); // Prevent unverified login
@@ -77,10 +76,13 @@ function login() {
 }
 
 
+
 </script>
+<input type="text" id="signupUsername" placeholder="Enter username">
 <input type="email" id="signupEmail" placeholder="Enter email">
 <input type="password" id="signupPass" placeholder="Enter password">
 <button onclick="signup()">Sign Up</button>
+
 
 <input type="email" id="loginEmail" placeholder="Enter email">
 <input type="password" id="loginPass" placeholder="Enter password">
