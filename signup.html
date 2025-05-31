@@ -40,16 +40,20 @@ function signup() {
             // Update profile with username
             return user.updateProfile({
                 displayName: username
+            }).then(() => {
+                // Send verification email **after** updating profile
+                return user.sendEmailVerification();
             });
         })
         .then(() => {
-            alert("Signup successful! Username saved.");
+            alert("Signup successful! Verification email sent.");
         })
         .catch(error => {
             console.error("Signup failed:", error);
             alert(error.message);
         });
 }
+
 
 
 
