@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<h1 id="userName">User Profile</h1>
+<p id="userID"></p>
+
+<script>
+    // Initialize Firebase
+    const firebaseConfig = { /* Your Firebase Config */ };
+    firebase.initializeApp(firebaseConfig);
+
+    // Get user ID from URL
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get("id");
+
+    if (userId) {
+        firebase.firestore().collection("users").doc(userId).get()
+            .then(doc => {
+                if (doc.exists) {
+                    document.getElementById("userName").innerText = `Welcome, ${doc.data().username}!`;
+                    document.getElementById("userID").innerText = `User ID: ${doc.data().userId}`; // Only showing safe public data
+                } else {
+                    document.getElementById("userName").innerText = "User not found.";
+                }
+            })
+            .catch(error => console.error("Error fetching user:", error));
+    } else {
+        document.getElementById("userName").innerText = "Invalid user ID.";
+    }
+</script>
+<script>
+firebase.firestore().collection("users").get()
+    .then(snapshot => {
+        snapshot.forEach(doc => {
+            let userLink = document.createElement("a");
+            userLink.href = `https://770q7.github.io/partbox/users/?id=${doc.id}`;
+            userLink.innerText = doc.data().username;
+            document.body.appendChild(userLink);
+        });
+    })
+    .catch(error => console.error("Error fetching users:", error));
+</script>
+</body>
+</html>
